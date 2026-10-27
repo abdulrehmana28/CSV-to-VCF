@@ -17,10 +17,9 @@ VCF contact files.
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
-cd YOUR-REPO
+git clone https://github.com/abdulrehmana28/CSV-to-VCF.git
+cd CSV-to-VCF
 ```
-
 Alternatively, download the repository as a ZIP from GitHub and extract it.
 
 ### 2. Check Python
