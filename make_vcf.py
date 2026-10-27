@@ -456,6 +456,8 @@ def convert_rows(rows, columns, code_override="", show_code=True,
             "preview": [],
         })
 
+        # The phone number is the duplicate key inside a batch. The same
+        # number is skipped even if it was written with a different name.
         if phone in batch["numbers"]:
             skipped.append({
                 "row": source_row, "name": name, "phone": phone,
