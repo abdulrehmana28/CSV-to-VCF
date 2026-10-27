@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# Private student data — never commit these
+# ---------------------------------------------------------------------------
+# Registration exports may contain names, phone numbers, and other personal data.
+*.csv
+*.xlsx
+*.xls
+*.xlsm
+
+# Generated WhatsApp contacts and skipped-row reports
+*.vcf
+*.vcard
+vcf_output/
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# ---------------------------------------------------------------------------
+# Unused Node scaffolding (this project is Python-only)
+# ---------------------------------------------------------------------------
+/package.json
+/package-lock.json
+/pnpm-lock.yaml
+/yarn.lock
+node_modules/
+
+# ---------------------------------------------------------------------------
+# Local project notes (not part of the published app)
+# ---------------------------------------------------------------------------
+/seerah_vcf_instructions.md
+
+# ---------------------------------------------------------------------------
+# Logs, temporary files, and editors
+# ---------------------------------------------------------------------------
+*.log
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/

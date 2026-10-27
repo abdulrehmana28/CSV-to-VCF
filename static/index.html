@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#0c5c46">
+  <title>Seerah Contacts — VCF Generator</title>
+  <meta name="description" content="Create WhatsApp-ready contact files from a Seerah student list. Runs fully offline.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230c5c46'/%3E%3Cpath d='M18 22h28M18 32h28M18 42h18' stroke='%23f5e7bd' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Seerah Contacts home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M7 9.5h18M7 16h18M7 22.5h11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+            <circle cx="24.5" cy="22.5" r="3.2" stroke="currentColor" stroke-width="2.2"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-eyebrow">Seerah Campaign</span>
+          <span class="brand-name">Contact File Generator</span>
+        </span>
+      </a>
+      <span class="privacy-pill">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M5.5 8.5V6.75a4.5 4.5 0 0 1 9 0V8.5M4.75 8.5h10.5v7.25H4.75z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Offline &amp; private
+      </span>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">WhatsApp contact builder</p>
+        <h1>Student list in.<br><em>Ready-to-import contacts out.</em></h1>
+        <p class="hero-copy">
+          Upload the registration CSV or Excel file, add the batch code, and download a VCF
+          you can import into your phone. Every contact name starts with the code, so the
+          right students are easy to find in WhatsApp.
+        </p>
+        <ul class="hero-points" aria-label="How it works">
+          <li><span>1</span> Choose file</li>
+          <li><span>2</span> Add batch code</li>
+          <li><span>3</span> Download VCF</li>
+        </ul>
+      </section>
+
+      <section class="panel converter" aria-labelledby="converter-title">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Create contacts</p>
+            <h2 id="converter-title">New contact file</h2>
+          </div>
+          <span class="file-types">CSV · XLSX</span>
+        </div>
+
+        <form id="convert-form" novalidate>
+          <div class="form-step">
+            <div class="step-head">
+              <span class="step-number" aria-hidden="true">1</span>
+              <div>
+                <h3>Upload the student list</h3>
+                <p>Use the file exported from the registration form.</p>
+              </div>
+            </div>
+
+            <div id="dropzone" class="dropzone" role="button" tabindex="0"
+                 aria-controls="file-input" aria-label="Choose a CSV or Excel file">
+              <span class="drop-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M12 16V5m0 0L8 9m4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"
+                        stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="drop-copy">
+                <strong>Drop your file here</strong>
+                <span>or <u>choose a file</u> from this computer</span>
+              </span>
+              <span class="drop-formats">.csv &nbsp; .xlsx</span>
+            </div>
+            <input id="file-input" class="visually-hidden" type="file"
+                   accept=".csv,.xlsx,.xlsm,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+
+            <div id="file-chip" class="file-chip" hidden>
+              <span class="file-chip-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none">
+                  <path d="M6 2.75h5l3 3v11.5H6z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                  <path d="M11 2.75v3h3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="file-chip-copy">
+                <strong id="file-name">file.csv</strong>
+                <span id="file-size">0 KB</span>
+              </span>
+              <button id="remove-file" class="icon-button" type="button" aria-label="Remove chosen file">
+                <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="m5 5 10 10M15 5 5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-step">
+            <div class="step-head">
+              <span class="step-number" aria-hidden="true">2</span>
+              <div>
+                <h3>Add the batch code</h3>
+                <p>This code is added to every contact name and used as the file name.</p>
+              </div>
+            </div>
+
+            <label class="field-label" for="batch-code">Batch code</label>
+            <input id="batch-code" class="text-input" type="text" name="code"
+                   placeholder="e.g. SCRYK-8001" autocomplete="off" autocapitalize="characters"
+                   spellcheck="false" aria-describedby="batch-code-hint">
+            <p id="batch-code-hint" class="hint">
+              Required when the file does not already contain batch codes. The last code you
+              used is remembered on this device.
+            </p>
+          </div>
+
+          <div class="form-step">
+            <div class="step-head">
+              <span class="step-number" aria-hidden="true">3</span>
+              <div>
+                <h3>Choose the contact name style</h3>
+                <p>The batch code always stays in the name, so it can be searched in WhatsApp.</p>
+              </div>
+            </div>
+
+            <label class="field-label" for="name-style">Name format</label>
+            <div class="select-wrap">
+              <select id="name-style" class="select-input" name="style">
+                <option value="brackets">[CODE] Ahmed Ali</option>
+                <option value="dash">CODE - Ahmed Ali</option>
+                <option value="parentheses">Ahmed Ali (CODE)</option>
+                <option value="prefix">CODE Ahmed Ali</option>
+              </select>
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                <path d="m6 8 4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+
+            <div class="name-preview">
+              <span class="preview-label">Preview in WhatsApp</span>
+              <span id="preview-name" class="preview-name">[SCRYK-8001] Ahmed Ali</span>
+            </div>
+          </div>
+
+          <div id="form-error" class="alert" role="alert" hidden></div>
+
+          <button id="submit-btn" class="primary-button" type="submit">
+            <span class="button-label">Generate contact file</span>
+            <svg class="button-arrow" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M4 10h11m0 0-4-4m4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+
+          <p class="privacy-note">
+            <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+              <path d="M5 7.5V6a4 4 0 0 1 8 0v1.5M4.25 7.5h9.5v6.75h-9.5z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Your file stays on this computer. Nothing is uploaded to the internet.
+          </p>
+        </form>
+      </section>
+
+      <section id="results" class="results" aria-live="polite" hidden>
+        <div class="results-head">
+          <div>
+            <p class="eyebrow">Finished</p>
+            <h2>Your contact files are ready</h2>
+          </div>
+          <button id="reset-btn" class="ghost-button" type="button">Convert another file</button>
+        </div>
+
+        <div class="stats" aria-label="Conversion summary">
+          <div class="stat">
+            <span class="stat-label">Rows read</span>
+            <strong id="stat-rows">0</strong>
+          </div>
+          <div class="stat stat-accent">
+            <span class="stat-label">Contacts ready</span>
+            <strong id="stat-contacts">0</strong>
+          </div>
+          <div class="stat">
+            <span class="stat-label">Rows skipped</span>
+            <strong id="stat-skipped">0</strong>
+          </div>
+        </div>
+
+        <div id="batches" class="batches"></div>
+
+        <div id="skipped-panel" class="panel skipped-panel">
+          <div class="skipped-head">
+            <div>
+              <h3>Rows that need attention</h3>
+              <p id="skipped-summary">No rows were skipped.</p>
+            </div>
+            <a id="report-link" class="text-link" href="#" download>Download skipped report</a>
+          </div>
+          <div id="skipped-table-wrap" class="table-wrap" hidden></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Seerah contact files</span>
+      <span class="footer-dot" aria-hidden="true">·</span>
+      <span>Local-only tool. No cloud, no account, no upload.</span>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
