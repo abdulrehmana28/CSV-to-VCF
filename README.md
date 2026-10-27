@@ -5,6 +5,19 @@ VCF contact files.
 
 ## Start
 
+### Windows
+
+Double-click `start_web.bat`, or run it from Command Prompt:
+
+```bat
+start_web.bat
+```
+
+Python 3 must be installed and available on your PATH. If it is missing, the
+script shows the download link and installation instructions.
+
+### Linux / macOS
+
 ```bash
 ./start_web.sh
 ```
@@ -48,6 +61,12 @@ The original CLI still works:
 
 ```bash
 python3 make_vcf.py --input students.csv --code SCRYK-8001
+```
+
+On Windows:
+
+```bat
+py -3 make_vcf.py --input students.csv --code SCRYK-8001
 ```
 
 ## Do not commit student data
