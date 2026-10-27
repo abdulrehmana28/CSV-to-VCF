@@ -3,9 +3,53 @@
 A local-only web app that turns a student CSV/Excel file into WhatsApp-ready
 VCF contact files.
 
-## Start
+## Project setup
 
-### Windows
+### Requirements
+
+- **Python 3.8 or newer** (3.10+ recommended)
+- A modern web browser (Chrome, Edge, Firefox, or Safari)
+- No `pip` packages are needed
+- No internet connection is needed after the project is downloaded
+
+### 1. Get the project
+
+Clone the repository:
+
+```bash
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+cd YOUR-REPO
+```
+
+Alternatively, download the repository as a ZIP from GitHub and extract it.
+
+### 2. Check Python
+
+**Windows**
+
+```bat
+py -3 --version
+```
+
+If `py` is not available, try:
+
+```bat
+python --version
+```
+
+**Linux / macOS**
+
+```bash
+python3 --version
+```
+
+You should see `Python 3.x.x`. If Python is missing, install it from
+<https://www.python.org/downloads/>. On Windows, select **Add Python to PATH**
+during installation.
+
+### 3. Start the app
+
+**Windows**
 
 Double-click `start_web.bat`, or run it from Command Prompt:
 
@@ -13,23 +57,46 @@ Double-click `start_web.bat`, or run it from Command Prompt:
 start_web.bat
 ```
 
-Python 3 must be installed and available on your PATH. If it is missing, the
-script shows the download link and installation instructions.
+The script uses `py -3` first and falls back to `python`. If Python is missing,
+it shows the download link and installation instructions.
 
-### Linux / macOS
+**Linux / macOS**
 
 ```bash
 ./start_web.sh
 ```
 
-Or, if the script is not executable:
+If you get a permission error:
+
+```bash
+chmod +x start_web.sh
+./start_web.sh
+```
+
+You can also start the server directly:
 
 ```bash
 python3 webapp.py
 ```
 
-Your browser opens at <http://127.0.0.1:8000>. If port 8000 is busy, the app
-uses the next free port and prints the address in the terminal.
+### 4. Open the app
+
+The browser opens automatically at <http://127.0.0.1:8000>. If it does not,
+open that address manually. If port 8000 is busy, the app uses the next free
+port and prints the address in the terminal.
+
+Keep the terminal window open while using the app. Closing it stops the local
+server.
+
+### Setup troubleshooting
+
+| Problem | Solution |
+| --- | --- |
+| `Python was not found` | Install Python 3 and enable **Add Python to PATH**. |
+| `Permission denied: ./start_web.sh` | Run `chmod +x start_web.sh` once, then start again. |
+| Browser did not open | Open the URL printed in the terminal manually. |
+| Port already in use | Use the new port printed in the terminal, or run `python3 webapp.py --port 8010`. |
+| App does not load | Make sure the terminal running the app is still open. |
 
 ## How to use
 
@@ -41,6 +108,16 @@ uses the next free port and prints the address in the terminal.
 
 The contact names look like `[SCRYK-8001] Ahmed Ali`, so searching the batch
 code in WhatsApp shows only that batch's contacts.
+
+## Project structure
+
+```text
+make_vcf.py        CSV/Excel -> VCF conversion logic and optional CLI
+webapp.py          Local web server and upload/download API
+start_web.sh       Linux/macOS launcher
+start_web.bat      Windows launcher
+static/            HTML, CSS, and JavaScript interface
+```
 
 ## Where files are saved
 

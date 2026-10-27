@@ -4,14 +4,14 @@ cd /d "%~dp0"
 set PYTHONUTF8=1
 
 rem Prefer the Windows Python launcher, then fall back to python.exe.
-py -3 --version >nul 2>nul
+py -3 -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>nul
 if not errorlevel 1 goto run_py
 
-python -c "import sys; sys.exit(0 if sys.version_info[0] == 3 else 1)" >nul 2>nul
+python -c "import sys; raise SystemExit(0 if sys.version_info >= (3, 8) else 1)" >nul 2>nul
 if not errorlevel 1 goto run_python
 
 echo.
-echo Python 3 was not found on this computer.
+echo Python 3.8 or newer was not found on this computer.
 echo.
 echo Install it from https://www.python.org/downloads/
 echo During installation, select "Add Python to PATH".
