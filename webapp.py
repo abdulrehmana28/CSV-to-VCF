@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-Local web interface for the Seerah WhatsApp VCF converter.
+Local web interface for the Seerah contact tools.
+
+Turns a student CSV/Excel file into WhatsApp-ready VCF files, and turns a VCF
+file into a Google Sheets-ready call-tracking CSV.
 
 Run:
     python3 webapp.py
@@ -18,6 +21,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, quote, unquote, urlparse
 
+import make_sheet
 import make_vcf
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -106,6 +110,10 @@ class Handler(BaseHTTPRequestHandler):
             self._serve_static("index.html")
             return
 
+        if path in ("/sheet", "/sheet.html"):
+            self._serve_static("sheet.html")
+            return
+
         if path == "/favicon.ico":
             self._send(204, "image/x-icon", b"")
             return
@@ -169,16 +177,8 @@ class Handler(BaseHTTPRequestHandler):
 
     # ---------- POST ----------
 
-    def do_POST(self):
-        if not self._host_allowed():
-            self._send(403, "text/plain; charset=utf-8", b"Forbidden")
-            return
-
-        parsed = urlparse(self.path)
-        if parsed.path != "/api/convert":
-            self._send(404, "text/plain; charset=utf-8", b"Not found")
-            return
-
+    def _read_upload(self):
+        """Read the request body, returning None when a response was already sent."""
         try:
             length = int(self.headers.get("Content-Length") or "0")
         except ValueError:
@@ -186,15 +186,39 @@ class Handler(BaseHTTPRequestHandler):
 
         if length <= 0:
             self._send_error_json(400, "No file was received. Please choose a file and try again.")
-            return
+            return None
 
         if length > MAX_UPLOAD_BYTES:
             self._send_error_json(413, "The file is too large. The limit is 50 MB.")
-            return
+            return None
 
         data = self._read_body(length)
         if not data:
             self._send_error_json(400, "The uploaded file is empty.")
+            return None
+
+        return data
+
+    def do_POST(self):
+        if not self._host_allowed():
+            self._send(403, "text/plain; charset=utf-8", b"Forbidden")
+            return
+
+        parsed = urlparse(self.path)
+
+        if parsed.path == "/api/convert":
+            self._handle_convert(parsed)
+            return
+
+        if parsed.path == "/api/vcf-to-sheet":
+            self._handle_vcf_to_sheet(parsed)
+            return
+
+        self._send(404, "text/plain; charset=utf-8", b"Not found")
+
+    def _handle_convert(self, parsed):
+        data = self._read_upload()
+        if data is None:
             return
 
         params = parse_qs(parsed.query)
@@ -248,6 +272,46 @@ class Handler(BaseHTTPRequestHandler):
             "written": [path.name for path in written],
         })
 
+    def _handle_vcf_to_sheet(self, parsed):
+        data = self._read_upload()
+        if data is None:
+            return
+
+        params = parse_qs(parsed.query)
+        filename = (params.get("filename") or ["contacts.vcf"])[0]
+
+        if not filename.lower().endswith(".vcf"):
+            self._send_error_json(400, "Please upload a .vcf contact file.")
+            return
+
+        try:
+            result = make_sheet.convert_vcf_bytes(data, filename)
+            csv_path = make_sheet.write_call_sheet(result, self.output_dir, filename)
+        except make_vcf.InputError as error:
+            self._send_error_json(400, str(error))
+            return
+        except Exception as error:  # keep the UI useful if something unexpected happens
+            print(f"[web] call sheet failed: {error!r}")
+            self._send_error_json(500, f"Could not generate the call sheet: {error}")
+            return
+
+        skipped = result["skipped"]
+        rows = result["rows"]
+
+        self._send_json(200, {
+            "ok": True,
+            "total_contacts": result["total_contacts"],
+            "total_rows": result["total_rows"],
+            "skipped_total": len(skipped),
+            "skipped": skipped[:SKIPPED_PREVIEW_LIMIT],
+            "skipped_limited": len(skipped) > SKIPPED_PREVIEW_LIMIT,
+            "filename": csv_path.name,
+            "download_url": "/download/" + quote(csv_path.name),
+            "preview": rows[:PREVIEW_LIMIT],
+            "preview_limited": len(rows) > PREVIEW_LIMIT,
+            "columns": make_sheet.OUTPUT_HEADER,
+        })
+
 
 class AppServer(ThreadingHTTPServer):
     daemon_threads = True
@@ -265,7 +329,7 @@ def find_server(start_port, max_tries=20):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Local web interface for the VCF converter.")
+    parser = argparse.ArgumentParser(description="Local web interface for the Seerah contact tools.")
     parser.add_argument("--port", type=int, default=8000, help="Port to use (default: 8000)")
     parser.add_argument("--no-browser", action="store_true", help="Do not open a browser")
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT_DIR),
@@ -282,9 +346,10 @@ def main(argv=None):
     url = f"http://127.0.0.1:{port}/"
 
     print()
-    print("  Seerah Contacts — local VCF generator")
-    print(f"  Open: {url}")
-    print(f"  Files save to: {Handler.output_dir}")
+    print("  Seerah Contacts — local contact tools")
+    print(f"  Create VCF:      {url}")
+    print(f"  VCF call sheet:  {url}sheet")
+    print(f"  Files save to:   {Handler.output_dir}")
     print("  Press Ctrl+C to stop.")
     print()
 

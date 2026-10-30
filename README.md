@@ -1,7 +1,10 @@
 # Seerah Contacts — web interface
 
-A local-only web app that turns a student CSV/Excel file into WhatsApp-ready
-VCF contact files.
+A local-only web app with two tools:
+
+- **CSV/Excel → VCF** — turn a student list into WhatsApp-ready contact files.
+- **VCF → Call sheet** — turn a VCF contact file into a CSV for Google Sheets,
+  with three call-tracking columns added.
 
 ## Project setup
 
@@ -99,6 +102,8 @@ server.
 
 ## How to use
 
+### Create contacts from a student list
+
 1. Drop the registration **.csv** or **.xlsx** file onto the page.
 2. Enter the batch code, for example `SCRYK-8001`.
 3. Choose the contact name style.
@@ -108,10 +113,32 @@ server.
 The contact names look like `[SCRYK-8001] Ahmed Ali`, so searching the batch
 code in WhatsApp shows only that batch's contacts.
 
+### Create a call sheet from a VCF
+
+1. Open **VCF → Call sheet** in the top navigation, or go to `/sheet`.
+2. Drop one **.vcf** file onto the page.
+3. Click **Generate call sheet**.
+4. Download the CSV and import it into Google Sheets.
+
+The CSV has one row per contact with these columns:
+
+| Name | Phone | Phone Called | Is Received | Reason |
+| --- | --- | --- | --- | --- |
+| M Ali | +923242957975 | No | No | |
+
+`Phone Called` and `Is Received` start as **No**, and `Reason` starts empty so
+the calling team can fill them in. If a contact has no usable phone number, it
+is skipped and shown in the results.
+
+Google Sheets may auto-format the **Phone** column. If the leading `+` or a
+leading zero disappears, select the column and use **Format → Number → Plain
+text** before relying on the numbers.
+
 ## Project structure
 
 ```text
 make_vcf.py        CSV/Excel -> VCF conversion logic and optional CLI
+make_sheet.py      VCF -> Google Sheets call-sheet conversion
 webapp.py          Local web server and upload/download API
 start_web.sh       Linux/macOS launcher
 start_web.bat      Windows launcher
@@ -122,6 +149,7 @@ static/            HTML, CSS, and JavaScript interface
 
 - `vcf_output/<CODE>.vcf` — generated contact file
 - `vcf_output/vcf_skipped_rows.csv` — rows skipped and why
+- `vcf_output/<NAME>_call_sheet.csv` — Google Sheets-ready call sheet
 
 ## Privacy
 
